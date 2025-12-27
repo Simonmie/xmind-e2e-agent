@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": ["vue", "vite/client"]
+  },
+  "vueCompilerOptions": {
+    "globalTypesPath": "./node_modules/vue/macros-global.d.ts"
+  },
+  "exclude": ["node_modules", "dist"]
+}
