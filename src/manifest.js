@@ -3,7 +3,7 @@ import { isDev, port } from './utils/config.js'
 export const getManifest = () => {
   const m = {
     manifest_version: 3,
-    name: 'Vue Chrome Extension',
+    name: 'Xmind E2E Agent',
     version: '0.0.0',
     icons: {
       16: 'dist/icons/logo-16.png',
@@ -12,7 +12,7 @@ export const getManifest = () => {
       128: 'dist/icons/logo-128.png',
     },
     action: {
-      default_popup: 'dist/src/popup/index.html',
+      // default_popup: 'dist/src/popup/index.html',
       default_icon: {
         16: 'dist/icons/logo-16.png',
         32: 'dist/icons/logo-32.png',
@@ -20,8 +20,8 @@ export const getManifest = () => {
     },
     side_panel: { default_path: 'dist/src/sidepanel/index.html' },
     options_page: 'dist/src/options/index.html',
-    permissions: ['storage', 'sidePanel'],
-    host_permissions: isDev ? [`http://localhost:${port}/*`] : [],
+    permissions: ['storage', 'sidePanel', 'activeTab', 'tabs'],
+    host_permissions: ['<all_urls>'],
     background: isDev
       ? { service_worker: 'dist/script/dev-hmr.js', type: 'module' }
       : { service_worker: 'dist/script/background.js', type: 'module' },
