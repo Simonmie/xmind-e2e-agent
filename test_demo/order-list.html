@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>汪集市 - 订单列表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#78350f',
+                        secondary: '#f5f5f4',
+                        accent: '#d97706',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #fafaf9; }
+        /* Hide scrollbar for tabs */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-stone-800 pb-10">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white z-50 shadow-sm">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button onclick="history.back()" class="p-2 -ml-2 rounded-full hover:bg-stone-100 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <h1 class="font-bold text-lg text-stone-800" id="page-title">我的交易</h1>
+            <div class="w-10"></div> <!-- Spacer for centering -->
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex overflow-x-auto no-scrollbar border-t border-stone-100 px-2" id="tabs-container">
+            <div class="px-4 py-3 whitespace-nowrap text-sm font-medium border-b-2 border-primary text-primary cursor-pointer tab-item" data-type="published">我发布的</div>
+            <div class="px-4 py-3 whitespace-nowrap text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 cursor-pointer tab-item" data-type="sold">我卖出的</div>
+            <div class="px-4 py-3 whitespace-nowrap text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 cursor-pointer tab-item" data-type="bought">我买到的</div>
+            <div class="px-4 py-3 whitespace-nowrap text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 cursor-pointer tab-item" data-type="wanted">我想要的</div>
+        </div>
+    </header>
+
+    <!-- List Content -->
+    <main class="mt-28 px-3" id="list-container">
+        <!-- Template items will be injected here via JS based on type -->
+    </main>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="text-center py-6 text-stone-400 text-sm hidden">
+        <span class="inline-block animate-bounce">🐶</span> 正在加载数据...
+    </div>
+
+    <script src="toast.js"></script>
+    <script>
+        // Mock Data Generators
+        const mockItems = {
+            published: [
+                { title: '全新未拆封猫爬架 实木', price: '128.00', status: '在售', img: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?w=200', views: 342, wants: 12 },
+                { title: '皇家幼犬狗粮 5kg', price: '210.00', status: '在售', img: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=200', views: 89, wants: 3 }
+            ],
+            sold: [
+                { title: '二手宠物航空箱', price: '45.00', status: '已发货', img: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?w=200', buyer: '柯基大队长' }
+            ],
+            bought: [
+                { title: '宠物除毛梳子', price: '19.90', status: '已签收', img: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=200', seller: '喵星人杂货铺' },
+                { title: '狗狗磨牙棒 耐咬型', price: '25.00', status: '运输中', img: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=200', seller: '爱宠人士小王' }
+            ],
+            wanted: [
+                { title: '智能全自动猫砂盆', price: '899.00', status: '在售', img: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?w=200', seller: '科技养宠' },
+                { title: '冬季保暖猫窝', price: '58.00', status: '在售', img: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=200', seller: '温暖之家' }
+            ]
+        };
+
+        const titles = {
+            published: '我发布的',
+            sold: '我卖出的',
+            bought: '我买到的',
+            wanted: '我想要的'
+        };
+
+        const listContainer = document.getElementById('list-container');
+        const loadingIndicator = document.getElementById('loading');
+        
+        function renderItems(type) {
+            listContainer.innerHTML = '';
+            loadingIndicator.classList.remove('hidden');
+
+            setTimeout(() => {
+                const items = mockItems[type] || [];
+                
+                if (items.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="text-center py-20 text-stone-400">
+                            <div class="text-4xl mb-3">🪹</div>
+                            <p>这里空空如也~</p>
+                        </div>
+                    `;
+                } else {
+                    const html = items.map(item => `
+                        <div class="bg-white rounded-lg p-3 mb-3 shadow-sm flex gap-3 cursor-pointer active:opacity-70 transition-opacity" onclick="window.location.href='detail.html?title=${encodeURIComponent(item.title)}&price=${item.price}&img=${encodeURIComponent(item.img)}'">
+                            <div class="w-24 h-24 rounded-md bg-stone-100 overflow-hidden flex-shrink-0">
+                                <img src="${item.img}" alt="商品" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-1 flex flex-col justify-between py-1">
+                                <div>
+                                    <div class="flex justify-between items-start gap-2 mb-1">
+                                        <h3 class="font-medium text-sm line-clamp-2 leading-snug">${item.title}</h3>
+                                        <span class="text-[10px] ${item.status === '在售' ? 'text-green-500 bg-green-50' : 'text-orange-500 bg-orange-50'} px-1.5 py-0.5 rounded flex-shrink-0">${item.status}</span>
+                                    </div>
+                                    ${item.views ? `<div class="text-[10px] text-stone-400 mt-1">浏览 ${item.views} · 想要 ${item.wants}</div>` : ''}
+                                    ${item.buyer ? `<div class="text-[10px] text-stone-400 mt-1">买家: ${item.buyer}</div>` : ''}
+                                    ${item.seller ? `<div class="text-[10px] text-stone-400 mt-1">卖家: ${item.seller}</div>` : ''}
+                                </div>
+                                <div class="flex justify-between items-end mt-2">
+                                    <div class="text-accent font-bold text-sm">¥ ${item.price}</div>
+                                    <button class="border border-stone-200 text-stone-600 px-3 py-1 rounded-full text-[10px]" onclick="event.stopPropagation(); showToast('更多操作开发中')">
+                                        更多
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    listContainer.innerHTML = html;
+                }
+                loadingIndicator.classList.add('hidden');
+            }, 400); // mock network delay
+        }
+
+        function switchTab(type) {
+            // Update Title
+            document.getElementById('page-title').innerText = titles[type] || '订单列表';
+
+            // Update Tabs UI
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                if (tab.dataset.type === type) {
+                    tab.classList.replace('border-transparent', 'border-primary');
+                    tab.classList.replace('text-stone-500', 'text-primary');
+                } else {
+                    tab.classList.replace('border-primary', 'border-transparent');
+                    tab.classList.replace('text-primary', 'text-stone-500');
+                }
+            });
+
+            // Render content
+            renderItems(type);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const initialType = params.get('type') || 'published';
+            
+            // Tab click listeners
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const type = e.target.dataset.type;
+                    // Update URL without reloading
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.set('type', type);
+                    window.history.pushState({}, '', newUrl);
+                    
+                    switchTab(type);
+                });
+            });
+
+            // Initial load
+            switchTab(initialType);
+        });
+    </script>
+</body>
+</html>

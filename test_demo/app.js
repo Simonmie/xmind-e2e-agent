@@ -129,8 +129,16 @@ if (searchInput && searchSuggestions) {
   document.querySelectorAll('.suggestion-item').forEach((item) => {
     item.addEventListener('click', (e) => {
       searchInput.value = e.target.innerText
-      // Trigger search or something
+      if (window.showToast) window.showToast('正在搜索: ' + searchInput.value)
     })
+  })
+
+  // Handle enter key
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      if (window.showToast) window.showToast('正在搜索: ' + searchInput.value)
+      searchSuggestions.classList.add('hidden')
+    }
   })
 }
 

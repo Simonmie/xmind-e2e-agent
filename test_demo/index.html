@@ -92,19 +92,28 @@
     <!-- Categories -->
     <div class="mt-20 px-4">
       <div class="flex overflow-x-auto gap-4 no-scrollbar pb-2">
-        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+        <div
+          class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer"
+          onclick="showToast('食品区开发中')"
+        >
           <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-xl">
             🦴
           </div>
           <span class="text-xs text-stone-600">食品</span>
         </div>
-        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+        <div
+          class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer"
+          onclick="showToast('玩具区开发中')"
+        >
           <div class="w-12 h-12 bg-stone-200 rounded-full flex items-center justify-center text-xl">
             🎾
           </div>
           <span class="text-xs text-stone-600">玩具</span>
         </div>
-        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+        <div
+          class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer"
+          onclick="showToast('日用区开发中')"
+        >
           <div
             class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-xl"
           >
@@ -112,13 +121,19 @@
           </div>
           <span class="text-xs text-stone-600">日用</span>
         </div>
-        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+        <div
+          class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer"
+          onclick="showToast('服饰区开发中')"
+        >
           <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl">
             👕
           </div>
           <span class="text-xs text-stone-600">服饰</span>
         </div>
-        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+        <div
+          class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer"
+          onclick="showToast('医疗区开发中')"
+        >
           <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl">
             💊
           </div>
@@ -199,6 +214,7 @@
       </a>
     </nav>
 
+    <script src="toast.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>汪集市 - 聊天</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#78350f',
+                        secondary: '#f5f5f4',
+                        accent: '#d97706',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #fafaf9; }
+        .chat-container {
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white z-50 px-4 py-3 shadow-sm flex items-center justify-between">
+        <button onclick="history.back()" class="p-2 -ml-2 rounded-full hover:bg-stone-100 transition-opacity">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <h1 class="font-bold text-lg text-stone-800" id="chat-title">爱宠人士小王</h1>
+        <button class="p-2 -mr-2 rounded-full hover:bg-stone-100 transition-opacity" onclick="showToast('更多功能开发中')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+        </button>
+    </header>
+
+    <!-- Product Card (Optional) -->
+    <div class="fixed top-14 left-0 right-0 bg-white border-b border-stone-100 p-3 z-40 flex items-center gap-3 shadow-sm" id="product-card">
+        <div class="w-12 h-12 rounded bg-stone-100 overflow-hidden flex-shrink-0">
+            <img src="https://images.unsplash.com/photo-1545249390-6bdfa286032f?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" alt="Product" class="w-full h-full object-cover">
+        </div>
+        <div class="flex-1 min-w-0">
+            <h3 class="font-medium text-sm truncate">全新未拆封猫爬架 实木</h3>
+            <div class="text-accent font-bold text-sm">¥ 128.00</div>
+        </div>
+        <button class="text-primary border border-primary px-3 py-1.5 rounded-full text-xs font-medium transition-opacity" onclick="showToast('发送商品链接成功')">发送商品</button>
+    </div>
+
+    <!-- Chat Messages -->
+    <main class="mt-32 px-4 pb-4 chat-container no-scrollbar flex flex-col gap-4" id="chat-messages">
+        <!-- Time Divider -->
+        <div class="text-center">
+            <span class="text-[10px] text-stone-400 bg-stone-200/50 px-2 py-1 rounded-full">10:42 AM</span>
+        </div>
+
+        <!-- Received Message -->
+        <div class="flex items-end gap-2">
+            <div class="w-8 h-8 rounded-full bg-stone-200 overflow-hidden flex-shrink-0">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" class="w-full h-full object-cover">
+            </div>
+            <div class="bg-white px-4 py-2 rounded-2xl rounded-bl-sm shadow-sm max-w-[75%] text-sm">
+                亲，那个猫爬架还在吗？可以便宜点吗？
+            </div>
+        </div>
+
+        <!-- Sent Message -->
+        <div class="flex items-end gap-2 justify-end">
+            <div class="bg-amber-100 px-4 py-2 rounded-2xl rounded-br-sm shadow-sm max-w-[75%] text-sm">
+                还在的哦，九成新，几乎没怎么用过。
+            </div>
+            <div class="w-8 h-8 rounded-full bg-stone-200 overflow-hidden flex-shrink-0">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ginger" alt="Me" class="w-full h-full object-cover">
+            </div>
+        </div>
+
+        <!-- Sent Message -->
+        <div class="flex items-end gap-2 justify-end">
+            <div class="bg-amber-100 px-4 py-2 rounded-2xl rounded-br-sm shadow-sm max-w-[75%] text-sm">
+                你诚心要的话，包邮给你。
+            </div>
+            <div class="w-8 h-8 rounded-full bg-stone-200 overflow-hidden flex-shrink-0">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ginger" alt="Me" class="w-full h-full object-cover">
+            </div>
+        </div>
+        
+        <!-- Bottom spacing for scrolling -->
+        <div id="chat-bottom"></div>
+    </main>
+
+    <!-- Chat Input Area -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-3 z-50 safe-area-bottom">
+        <div class="flex items-center gap-2">
+            <button class="p-2 text-stone-500 hover:text-stone-700 transition-opacity" onclick="showToast('语音功能开发中')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+            </button>
+            <input type="text" id="message-input" placeholder="想对Ta说点什么..." class="flex-1 bg-stone-100 rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-primary border-none">
+            <button class="p-2 text-stone-500 hover:text-stone-700 transition-opacity" onclick="showToast('更多表情开发中')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+            <button class="p-2 text-stone-500 hover:text-stone-700 transition-opacity" onclick="showToast('发送图片/附件开发中')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+            <button id="send-btn" class="hidden bg-primary text-white px-4 py-2 rounded-full text-sm font-medium transition-opacity">
+                发送
+            </button>
+        </div>
+    </div>
+
+    <script src="toast.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const name = params.get('name');
+            if (name) {
+                document.getElementById('chat-title').innerText = decodeURIComponent(name);
+            }
+
+            // Scroll to bottom
+            const scrollToBottom = () => {
+                document.getElementById('chat-bottom').scrollIntoView({ behavior: 'smooth' });
+            };
+            setTimeout(scrollToBottom, 100);
+
+            // Handle Input & Send
+            const input = document.getElementById('message-input');
+            const sendBtn = document.getElementById('send-btn');
+            const messagesContainer = document.getElementById('chat-messages');
+            const bottomAnchor = document.getElementById('chat-bottom');
+
+            input.addEventListener('input', (e) => {
+                if (e.target.value.trim().length > 0) {
+                    sendBtn.classList.remove('hidden');
+                } else {
+                    sendBtn.classList.add('hidden');
+                }
+            });
+
+            const sendMessage = () => {
+                const text = input.value.trim();
+                if (!text) return;
+
+                const msgHTML = `
+                    <div class="flex items-end gap-2 justify-end mt-2 animate-[fadeIn_0.3s_ease-out]">
+                        <div class="bg-amber-100 px-4 py-2 rounded-2xl rounded-br-sm shadow-sm max-w-[75%] text-sm break-words">
+                            ${text}
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-stone-200 overflow-hidden flex-shrink-0">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ginger" alt="Me" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                `;
+
+                // Insert before the bottom anchor
+                bottomAnchor.insertAdjacentHTML('beforebegin', msgHTML);
+                
+                input.value = '';
+                sendBtn.classList.add('hidden');
+                scrollToBottom();
+
+                // Mock Reply
+                setTimeout(() => {
+                    const replyHTML = `
+                        <div class="flex items-end gap-2 mt-2 animate-[fadeIn_0.3s_ease-out]">
+                            <div class="w-8 h-8 rounded-full bg-stone-200 overflow-hidden flex-shrink-0">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" class="w-full h-full object-cover">
+                            </div>
+                            <div class="bg-white px-4 py-2 rounded-2xl rounded-bl-sm shadow-sm max-w-[75%] text-sm break-words">
+                                好的，我再考虑一下哈，谢谢！
+                            </div>
+                        </div>
+                    `;
+                    bottomAnchor.insertAdjacentHTML('beforebegin', replyHTML);
+                    scrollToBottom();
+                }, 1500);
+            };
+
+            sendBtn.addEventListener('click', sendMessage);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
