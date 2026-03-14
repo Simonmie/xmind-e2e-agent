@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>汪集市 - 首页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#78350f', // amber-900
+              secondary: '#f5f5f4', // stone-100
+              accent: '#d97706', // amber-600
+            },
+          },
+        },
+      }
+    </script>
+    <style>
+      /* Hide scrollbar for clean UI */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      body {
+        background-color: #fafaf9; /* stone-50 */
+      }
+    </style>
+  </head>
+  <body class="text-stone-800 pb-16">
+    <!-- Header & Search -->
+    <header class="fixed top-0 left-0 right-0 bg-white z-50 px-4 py-3 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="font-bold text-xl text-primary italic">汪集市</div>
+        <div class="flex-1 relative group">
+          <div class="flex items-center bg-stone-100 rounded-full px-3 py-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-stone-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              id="search-input"
+              placeholder="搜搜看，汪星人的宝藏..."
+              class="bg-transparent border-none outline-none ml-2 text-sm w-full placeholder-stone-400"
+            />
+          </div>
+
+          <!-- Search Suggestions -->
+          <div
+            id="search-suggestions"
+            class="absolute top-full left-0 right-0 bg-white shadow-lg rounded-lg mt-2 hidden p-2 border border-stone-100"
+          >
+            <div
+              class="p-2 hover:bg-stone-50 rounded cursor-pointer text-sm text-stone-600 suggestion-item"
+            >
+              柯基周边
+            </div>
+            <div
+              class="p-2 hover:bg-stone-50 rounded cursor-pointer text-sm text-stone-600 suggestion-item"
+            >
+              二手猫爬架
+            </div>
+            <div
+              class="p-2 hover:bg-stone-50 rounded cursor-pointer text-sm text-stone-600 suggestion-item"
+            >
+              未拆封狗粮
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Categories -->
+    <div class="mt-20 px-4">
+      <div class="flex overflow-x-auto gap-4 no-scrollbar pb-2">
+        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+          <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-xl">
+            🦴
+          </div>
+          <span class="text-xs text-stone-600">食品</span>
+        </div>
+        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+          <div class="w-12 h-12 bg-stone-200 rounded-full flex items-center justify-center text-xl">
+            🎾
+          </div>
+          <span class="text-xs text-stone-600">玩具</span>
+        </div>
+        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+          <div
+            class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-xl"
+          >
+            🏠
+          </div>
+          <span class="text-xs text-stone-600">日用</span>
+        </div>
+        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl">
+            👕
+          </div>
+          <span class="text-xs text-stone-600">服饰</span>
+        </div>
+        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl">
+            💊
+          </div>
+          <span class="text-xs text-stone-600">医疗</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <main class="px-3 mt-4">
+      <h2 class="font-bold text-lg mb-3 px-1 text-primary">最近更新</h2>
+      <div id="product-list" class="grid grid-cols-2 gap-3">
+        <!-- Products will be injected here by JS -->
+      </div>
+
+      <!-- Loading Indicator -->
+      <div id="loading" class="text-center py-4 text-stone-400 text-sm hidden">
+        <span class="inline-block animate-bounce">🐶</span> 正在嗅探更多宝贝...
+      </div>
+    </main>
+
+    <!-- Bottom Navbar -->
+    <nav
+      class="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 py-2 px-6 flex justify-between items-center z-50"
+    >
+      <a href="index.html" class="flex flex-col items-center gap-1 text-primary">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
+          />
+        </svg>
+        <span class="text-[10px] font-medium">首页</span>
+      </a>
+      <a
+        href="chat.html"
+        class="flex flex-col items-center gap-1 text-stone-400 hover:text-primary transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+          />
+        </svg>
+        <span class="text-[10px] font-medium">消息</span>
+      </a>
+      <a
+        href="profile.html"
+        class="flex flex-col items-center gap-1 text-stone-400 hover:text-primary transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
+        </svg>
+        <span class="text-[10px] font-medium">我的</span>
+      </a>
+    </nav>
+
+    <script src="app.js"></script>
+  </body>
+</html>

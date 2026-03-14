@@ -15,7 +15,13 @@
       <div class="section">
         <h3>1. 上传 XMind 测试用例</h3>
         <div class="file-upload">
-          <input type="file" accept=".xmind" @change="handleFileUpload" id="fileInput" class="hidden-input" />
+          <input
+            type="file"
+            accept=".xmind"
+            @change="handleFileUpload"
+            id="fileInput"
+            class="hidden-input"
+          />
           <label for="fileInput" class="upload-label">
             {{ fileName || '点击选择 XMind 文件' }}
           </label>
@@ -24,11 +30,7 @@
 
       <div class="section">
         <h3>2. 生成测试脚本</h3>
-        <button 
-          class="btn primary full-width" 
-          :disabled="!canGenerate" 
-          @click="startGeneration"
-        >
+        <button class="btn primary full-width" :disabled="!canGenerate" @click="startGeneration">
           {{ loading ? '生成中...' : '开始生成 (基于当前页面)' }}
         </button>
       </div>
@@ -70,7 +72,7 @@ const resultCode = ref('')
 
 const config = ref({
   visualModel: null,
-  codeModel: null
+  codeModel: null,
 })
 
 onMounted(async () => {
@@ -107,7 +109,7 @@ const handleFileUpload = async (event) => {
 
   fileName.value = file.name
   error.value = ''
-  
+
   try {
     statusMessage.value = '正在解析 XMind 文件...'
     const text = await parseXMindFile(file)
@@ -125,35 +127,31 @@ const canGenerate = computed(() => {
 
 const startGeneration = async () => {
   if (!canGenerate.value) return
-  
+
   loading.value = true
   error.value = ''
   resultCode.value = ''
-  
+
   try {
     // 1. Capture Screenshot
     statusMessage.value = '正在截取当前页面...'
     const window = await chrome.windows.getCurrent()
     const screenshotUrl = await chrome.tabs.captureVisibleTab(window.id, { format: 'png' })
-    
+
     // 2. Call Visual Model
     statusMessage.value = '视觉模型正在分析页面结构与测试用例...'
     const visualPrompt = await callVisualModel(
       config.value.visualModel,
       screenshotUrl,
-      fileContent.value
+      fileContent.value,
     )
-    
+
     // 3. Call Code Model
     statusMessage.value = '代码模型正在生成测试脚本...'
-    const code = await callCodeModel(
-      config.value.codeModel,
-      visualPrompt
-    )
-    
+    const code = await callCodeModel(config.value.codeModel, visualPrompt)
+
     resultCode.value = code
     statusMessage.value = '生成完成！'
-    
   } catch (err) {
     console.error(err)
     error.value = '生成失败: ' + err.message
@@ -163,9 +161,10 @@ const startGeneration = async () => {
 }
 
 const copyCode = () => {
-  navigator.clipboard.writeText(resultCode.value)
+  navigator.clipboard
+    .writeText(resultCode.value)
     .then(() => alert('已复制到剪贴板'))
-    .catch(err => alert('复制失败: ' + err))
+    .catch((err) => alert('复制失败: ' + err))
 }
 </script>
 
@@ -337,7 +336,9 @@ const copyCode = () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .error-message {

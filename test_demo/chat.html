@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>汪集市 - 消息</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#78350f',
+                        secondary: '#f5f5f4',
+                        accent: '#d97706',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #fafaf9; }
+    </style>
+</head>
+<body class="text-stone-800 pb-16">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white z-50 px-4 py-3 shadow-sm text-center">
+        <h1 class="font-bold text-lg text-stone-800">消息</h1>
+    </header>
+
+    <!-- Chat List -->
+    <main class="mt-14 px-4">
+        <!-- Message Item -->
+        <div class="flex items-center gap-3 py-4 border-b border-stone-100 cursor-pointer hover:bg-stone-50 transition-colors">
+            <div class="relative">
+                <div class="w-12 h-12 rounded-full bg-stone-200 overflow-hidden">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-baseline mb-1">
+                    <h3 class="font-bold text-sm truncate">爱宠人士小王</h3>
+                    <span class="text-xs text-stone-400">刚刚</span>
+                </div>
+                <p class="text-xs text-stone-500 truncate">亲，那个猫爬架还在吗？可以便宜点吗？</p>
+            </div>
+            <div class="w-12 h-12 rounded bg-stone-100 overflow-hidden flex-shrink-0">
+                <img src="https://images.unsplash.com/photo-1545249390-6bdfa286032f?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" alt="Product" class="w-full h-full object-cover">
+            </div>
+        </div>
+
+        <!-- Message Item -->
+        <div class="flex items-center gap-3 py-4 border-b border-stone-100 cursor-pointer hover:bg-stone-50 transition-colors">
+            <div class="relative">
+                <div class="w-12 h-12 rounded-full bg-stone-200 overflow-hidden">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Buddy" alt="User" class="w-full h-full object-cover">
+                </div>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-baseline mb-1">
+                    <h3 class="font-bold text-sm truncate">柯基大队长</h3>
+                    <span class="text-xs text-stone-400">昨天</span>
+                </div>
+                <p class="text-xs text-stone-500 truncate">发货了吗？我家狗子等不及了。</p>
+            </div>
+            <div class="w-12 h-12 rounded bg-stone-100 overflow-hidden flex-shrink-0">
+                <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" alt="Product" class="w-full h-full object-cover">
+            </div>
+        </div>
+
+        <!-- Message Item -->
+        <div class="flex items-center gap-3 py-4 border-b border-stone-100 cursor-pointer hover:bg-stone-50 transition-colors">
+            <div class="relative">
+                <div class="w-12 h-12 rounded-full bg-stone-200 overflow-hidden">
+                    <div class="w-full h-full flex items-center justify-center bg-orange-100 text-orange-500 font-bold">汪</div>
+                </div>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-baseline mb-1">
+                    <h3 class="font-bold text-sm truncate">汪集市小助手</h3>
+                    <span class="text-xs text-stone-400">3天前</span>
+                </div>
+                <p class="text-xs text-stone-500 truncate">欢迎来到汪集市！这里是爱宠人的乐园...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navbar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 py-2 px-6 flex justify-between items-center z-50">
+        <a href="index.html" class="flex flex-col items-center gap-1 text-stone-400 hover:text-primary transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span class="text-[10px] font-medium">首页</span>
+        </a>
+        <a href="chat.html" class="flex flex-col items-center gap-1 text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10H2l2.929-2.929c-.568-.948-.929-2.036-.929-3.212 0-1.176.361-2.264.929-3.212L2 12z" />
+                <path fill-rule="evenodd" d="M8 12a2 2 0 114 0 2 2 0 01-4 0zm6 0a2 2 0 114 0 2 2 0 01-4 0z" />
+            </svg>
+            <span class="text-[10px] font-medium">消息</span>
+        </a>
+        <a href="profile.html" class="flex flex-col items-center gap-1 text-stone-400 hover:text-primary transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span class="text-[10px] font-medium">我的</span>
+        </a>
+    </nav>
+
+</body>
+</html>
