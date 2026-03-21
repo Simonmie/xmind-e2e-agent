@@ -17,6 +17,10 @@
           <label>模型名称 (Model Name)</label>
           <input v-model="config.visualModel.model" type="text" placeholder="gpt-4o" />
         </div>
+        <div class="form-group">
+          <label>WebSocket 地址 (可选)</label>
+          <input v-model="config.visualModel.wsEndpoint" type="text" placeholder="wss://your-gateway.example/ws" />
+        </div>
       </div>
 
       <div class="card">
@@ -32,6 +36,10 @@
          <div class="form-group">
           <label>模型名称 (Model Name)</label>
           <input v-model="config.codeModel.model" type="text" placeholder="gpt-4-turbo" />
+        </div>
+        <div class="form-group">
+          <label>WebSocket 地址 (可选)</label>
+          <input v-model="config.codeModel.wsEndpoint" type="text" placeholder="wss://your-gateway.example/ws" />
         </div>
       </div>
 
@@ -54,12 +62,14 @@ const config = ref({
   visualModel: {
     endpoint: '',
     apiKey: '',
-    model: 'gpt-4o'
+    model: 'gpt-4o',
+    wsEndpoint: ''
   },
   codeModel: {
     endpoint: '',
     apiKey: '',
-    model: 'gpt-4-turbo'
+    model: 'gpt-4-turbo',
+    wsEndpoint: ''
   }
 })
 

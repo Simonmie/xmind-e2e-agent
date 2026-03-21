@@ -93,11 +93,13 @@ export default defineConfig({
     port,
   },
   define: {
-    'globalThis.__EXT_HMR__': JSON.stringify(`http://localhost:${port}/extension-hmr`),
+    'globalThis.__EXT_HMR__': isDev
+      ? JSON.stringify(`http://localhost:${port}/extension-hmr`)
+      : 'undefined',
   },
   build: {
     outDir: r('extension/dist'),
-    emptyOutDir: false,
+    emptyOutDir: true, // 每次构建前清空输出目录
     sourcemap: isDev ? 'inline' : false,
     terserOptions: {
       mangle: false,

@@ -20,17 +20,17 @@ export const getManifest = () => {
     },
     side_panel: { default_path: 'dist/src/sidepanel/index.html' },
     options_page: 'dist/src/options/index.html',
-    permissions: ['storage', 'sidePanel', 'activeTab', 'tabs'],
+    permissions: ['storage', 'sidePanel', 'activeTab', 'tabs', 'scripting', 'tabCapture'],
     host_permissions: ['<all_urls>'],
     background: isDev
       ? { service_worker: 'dist/script/dev-hmr.js', type: 'module' }
       : { service_worker: 'dist/script/background.js', type: 'module' },
     web_accessible_resources: [{ resources: ['dist/*'], matches: ['<all_urls>'] }],
   }
-  if (isDev) {
-    m.content_security_policy = {
-      extension_pages: `script-src 'self' http://localhost:${port}; object-src 'self'; connect-src 'self' ws://localhost:${port} http://localhost:${port}`,
-    }
+  m.content_security_policy = {
+    extension_pages: isDev
+      ? `script-src 'self' http://localhost:${port}; object-src 'self'; connect-src 'self' https: wss: ws://localhost:${port} http://localhost:${port}`
+      : `script-src 'self'; object-src 'self'; connect-src 'self' https: wss:`,
   }
   return m
 }
