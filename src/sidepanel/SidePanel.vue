@@ -108,7 +108,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { parseXMindFile } from '../utils/xmind'
-import { callVisualModel, callCodeModel } from '../utils/api'
+import { runVisualAnalysisAgent, runCaseSelectorAgent, runCodegenAgent } from '../utils/api'
 
 defineOptions({
   name: 'SidePanel',
@@ -368,54 +368,72 @@ const stopTabRecording = async () => {
   recordingState.value = 'ready'
 }
 
-const extractJsonText = (text) => {
-  const direct = text.trim()
-  try {
-    JSON.parse(direct)
-    return direct
-  } catch {
-    void 0
-  }
+const splitXmindCases = (text, options = {}) => {
+  const size = options.size || 24
+  const lines = String(text || '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line)
+  if (!lines.length) return []
 
-  const fenced = direct.match(/```json\s*([\s\S]*?)\s*```/i)
-  if (fenced?.[1]) {
-    return fenced[1]
-  }
+  const cases = lines.map((line, index) => ({
+    id: `case-${index + 1}`,
+    title: line.replace(/^-+\s*/, ''),
+  }))
 
-  const start = direct.indexOf('{')
-  const end = direct.lastIndexOf('}')
-  if (start >= 0 && end > start) {
-    return direct.slice(start, end + 1)
+  const chunks = []
+  for (let i = 0; i < cases.length; i += size) {
+    chunks.push(cases.slice(i, i + size))
   }
-  return ''
+  return chunks
 }
 
-const parseVisualOutput = (text) => {
-  const jsonText = extractJsonText(text)
-  if (!jsonText) {
-    return {
-      analysis_summary: '模型没有返回结构化 JSON，已使用原始结果继续生成。',
-      applicable_cases: [],
-      navigation_targets: [],
-      code_prompt: text,
-    }
+const uniqNavigationTargets = (targets) => {
+  const map = new Map()
+  for (const target of targets || []) {
+    const key = [
+      target?.action || '',
+      target?.matchText || '',
+      target?.target || '',
+      target?.urlHint || '',
+    ].join('|')
+    if (!map.has(key)) map.set(key, target)
   }
+  return Array.from(map.values())
+}
 
-  try {
-    const parsed = JSON.parse(jsonText)
-    return {
-      analysis_summary: parsed.analysis_summary || '',
-      applicable_cases: Array.isArray(parsed.applicable_cases) ? parsed.applicable_cases : [],
-      navigation_targets: Array.isArray(parsed.navigation_targets) ? parsed.navigation_targets : [],
-      code_prompt: parsed.code_prompt || text,
-    }
-  } catch {
-    return {
-      analysis_summary: 'JSON 解析失败，已回退为原始结果。',
-      applicable_cases: [],
-      navigation_targets: [],
-      code_prompt: text,
-    }
+const dedupeCasesById = (cases) => {
+  const map = new Map()
+  for (const item of cases || []) {
+    const key = String(item?.id || '').trim()
+    if (!key) continue
+    if (!map.has(key)) map.set(key, item)
+  }
+  return Array.from(map.values())
+}
+
+const mergeVisualParsedChunks = (chunks, analysisText) => {
+  const applicableCases = dedupeCasesById(
+    chunks.flatMap((item) => (Array.isArray(item.cases) ? item.cases : [])),
+  ).map((item) => ({
+    id: item.id,
+    title: item.title,
+    reason: item.reason || '',
+    priority: item.priority || 'P1',
+  }))
+  const navigationTargets = uniqNavigationTargets(
+    applicableCases.map((item) => ({
+      target: item.title,
+      matchText: item.title,
+      action: 'click',
+      caseId: item.id,
+    })),
+  ).slice(0, 8)
+  return {
+    analysis_summary: analysisText || '',
+    applicable_cases: applicableCases,
+    navigation_targets: navigationTargets,
+    code_prompt: JSON.stringify({ cases: applicableCases }, null, 2),
   }
 }
 
@@ -559,7 +577,7 @@ const buildReportHtml = () => {
   <div class="card">
     <h2>适配用例说明</h2>
     <ul>
-      ${cases.map((item) => `<li><strong>${escapeHtml(item.case || '')}</strong><br/>${escapeHtml(item.reason || '')}</li>`).join('')}
+      ${cases.map((item) => `<li><strong>${escapeHtml(item.id || '')} · ${escapeHtml(item.title || '')}</strong><br/>${escapeHtml(item.reason || '')}</li>`).join('')}
     </ul>
   </div>
   <div class="card">
@@ -622,19 +640,45 @@ const startGeneration = async () => {
       throw new Error('无法获取当前标签页')
     }
     const screenshotUrl = await chrome.tabs.captureVisibleTab(currentWindow.id, { format: 'png' })
+    const xmindChunks = splitXmindCases(fileContent.value)
+    if (!xmindChunks.length) {
+      throw new Error('XMind 解析结果为空，无法生成')
+    }
+    pushAutomationLog(`XMind 用例已分片，共 ${xmindChunks.length} 片，按顺序进行 case 筛选`)
 
-    statusMessage.value = '视觉模型正在流式分析页面结构与测试用例...'
-    const visualMessageId = appendConversation('visual', '视觉模型')
-    const visualOutput = await callVisualModel(
+    statusMessage.value = 'visual_analysis_agent 正在分析页面...'
+    const visualMessageId = appendConversation('visual', 'visual_analysis_agent')
+    const pageAnalysisText = await runVisualAnalysisAgent(
       config.value.visualModel,
       screenshotUrl,
-      fileContent.value,
+      '',
       {
         onDelta: (delta) => appendConversationText(visualMessageId, delta),
       },
     )
-    visualRawOutput.value = visualOutput
-    const visualParsed = parseVisualOutput(visualOutput)
+    visualRawOutput.value = pageAnalysisText
+
+    const selectedChunkResults = []
+    for (let i = 0; i < xmindChunks.length; i += 1) {
+      statusMessage.value = `case_selector_agent 处理中（分片 ${i + 1}/${xmindChunks.length}）...`
+      const selectorMessageId = appendConversation(
+        'visual',
+        `case_selector_agent（分片 ${i + 1}/${xmindChunks.length}）`,
+      )
+      const selected = await runCaseSelectorAgent(
+        config.value.visualModel,
+        {
+          pageAnalysisText,
+          casesChunk: xmindChunks[i],
+        },
+        {
+          onDelta: (delta) => appendConversationText(selectorMessageId, delta),
+        },
+      )
+      selectedChunkResults.push(selected)
+    }
+
+    const visualParsed = mergeVisualParsedChunks(selectedChunkResults, pageAnalysisText)
     visualParsedOutput.value = visualParsed
 
     statusMessage.value = '正在开启录屏...'
@@ -657,11 +701,8 @@ const startGeneration = async () => {
       pushAutomationLog('录屏已结束，可在下方预览或下载')
     }
 
-    statusMessage.value = '代码模型正在流式生成 Playwright 测试脚本...'
-    const codeMessageId = appendConversation('code', '代码模型')
-    const finalPrompt = `${visualParsed.code_prompt}
-
-自动执行日志:
+    statusMessage.value = 'codegen_agent 生成 Playwright 脚本中...'
+    const sharedContext = `自动执行日志:
 ${navigationResult.logs.join('\n')}
 
 访问页面快照:
@@ -671,16 +712,28 @@ ${navigationResult.snapshots.map((s, i) => `${i + 1}. ${s.title} - ${s.url}`).jo
 1) 可读的测试用例清单（每条包含：目标、前置条件、步骤、断言、说明）
 2) 对应 Playwright 测试脚本（优先 Playwright）
 3) 如有必要给出 Cypress 备选片段`
-    const code = await callCodeModel(config.value.codeModel, finalPrompt, {
-      onDelta: (delta) => appendConversationText(codeMessageId, delta),
-    })
 
-    resultCode.value = code
+    const codeMessageId = appendConversation('code', 'codegen_agent')
+    resultCode.value = await runCodegenAgent(
+      config.value.codeModel,
+      {
+        pageAnalysisText,
+        selectedCases: visualParsed.applicable_cases,
+        extraContext: sharedContext,
+      },
+      {
+        onDelta: (delta) => appendConversationText(codeMessageId, delta),
+      },
+    )
     statusMessage.value = '生成完成！'
     await openHtmlReport()
   } catch (err) {
     console.error(err)
-    error.value = '生成失败: ' + err.message
+    if (String(err?.message || '').includes('429')) {
+      error.value = `生成失败: ${err.message}\n当前已启用分片请求，建议进一步降低分片大小或稍后重试。`
+    } else {
+      error.value = '生成失败: ' + err.message
+    }
   } finally {
     if (recordingState.value === 'recording') {
       try {
